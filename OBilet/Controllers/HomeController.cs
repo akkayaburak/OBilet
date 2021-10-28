@@ -1,10 +1,8 @@
-﻿using Newtonsoft.Json;
-using OBilet.Models;
-using System;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Text;
+﻿using OBilet.Models;
+using OBilet.Operations;
 using System.Threading.Tasks;
+using System.Web;
+using System.Web.Http;
 using System.Web.Mvc;
 
 namespace OBilet.Controllers
@@ -13,51 +11,29 @@ namespace OBilet.Controllers
     {
         public async Task<ActionResult> Index()
         {
-            var client = new HttpClient();
-            GetSessionModel model = new GetSessionModel
-            {
-                Type = 7,
-                Connection = new Connection
-                {
-                    IpAddress = "78.173.70.56",
-                    Port = "5117"
-                },
-                Browser = new Browser
-                {
-                    Name = "Chrome",
-                    Version = "47.0.0.12"
-                }
-            };
-            client.BaseAddress = new Uri("https://v2-api.obilet.com/api");
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", "JEcYcEMyantZV095WVc3G2JtVjNZbWx1");
-            HttpRequestMessage req = new HttpRequestMessage(HttpMethod.Post, "https://v2-api.obilet.com/api/client/getsession") { Content = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json") };
-
-            var res = await client.SendAsync(req);
-            string resString = await res.Content.ReadAsStringAsync();
-            res.Dispose();
-            client.Dispose();
-
-
-            ResultSessionModel resultSession = JsonConvert.DeserializeObject<ResultSessionModel>(resString);
-            GetBusLocationsModel getBusLocations = new GetBusLocationsModel
-            {
-                DeviceSession = new DeviceSession
-                {
-                    DeviceId = resultSession.Data.DeviceId,
-                    SessionId = resultSession.Data.SessionId
-                },
-            };
-
-            client = new HttpClient();
-            client.BaseAddress = new Uri("https://v2-api.obilet.com/api");
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", "JEcYcEMyantZV095WVc3G2JtVjNZbWx1");
-            req = new HttpRequestMessage(HttpMethod.Post, "https://v2-api.obilet.com/api/location/getbuslocations") { Content = new StringContent(JsonConvert.SerializeObject(getBusLocations), Encoding.UTF8, "application/json") };
-            res = await client.SendAsync(req);
-            resString = await res.Content.ReadAsStringAsync();
-            ResultBusLocationsModel resultBusLocationsModel = JsonConvert.DeserializeObject<ResultBusLocationsModel>(resString);
-            ViewData["BusLocations"] = resultBusLocationsModel;
+            ResultSessionModel resultSessionModel = await OBiletOperations.GetSession();
+            HttpCookie sessionCookie = new HttpCookie("sessionCookie");
+            sessionCookie["DeviceId"] = resultSessionModel.Data.DeviceId;
+            sessionCookie["SessionId"] = resultSessionModel.Data.SessionId;
+            Response.Cookies.Add(sessionCookie);
+            ResultBusLocationsModel busLocationsModel = await OBiletOperations.GetBusLocations(resultSessionModel);
+            ViewData["BusLocations"] = busLocationsModel;
             return View();
         }
 
+        [System.Web.Mvc.HttpPost]
+        public async Task<ActionResult> BusJourneys([FromBody] GetBusJourneysModel getBusJourneysModel)
+        {
+            //HttpClient client = new HttpClient
+            //{
+            //    BaseAddress = new Uri("https://v2-api.obilet.com/api")
+            //};
+            //client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", "JEcYcEMyantZV095WVc3G2JtVjNZbWx1");
+            //HttpRequestMessage req = new HttpRequestMessage(HttpMethod.Post, "https://v2-api.obilet.com/api/journey/getbusjourneys") { Content = new StringContent(JsonConvert.SerializeObject(getBusJourneysModel), Encoding.UTF8, "application/json") };
+            //var res = await client.SendAsync(req);
+            //string resString = await res.Content.ReadAsStringAsync();
+            //ViewData["BusJourneys"] = getBusJourneysModel;
+            return Json(new { result = "Redirect", url = Url.Action("ActionName", "Home") });
+        }
     }
 }

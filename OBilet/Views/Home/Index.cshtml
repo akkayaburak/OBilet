@@ -7,149 +7,230 @@
 @{
     var busLocationsList = (ResultBusLocationsModel)ViewData["BusLocations"];
 }
-
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="https://code.jquery.com/ui/1.12.0/jquery-ui.js"></script>
+<script src="~/Scripts/pnotify.js"></script>
+<link href="~/Content/icheck/flat/green.css" rel="stylesheet" />
+<link href="~/Content/pnotify.css" rel="stylesheet" />
 <style>
     div.container.body-content {
         text-align: center;
     }
-    div.searchable {
-        width: 300px;
-        height: 100px;
+
+    div.form-group {
+        width: 200px;
+        height: 80px;
         float: none;
-        display: block;
         margin: auto;
+        position: relative;
     }
 
-    .searchable input {
-        width: 100%;
-        height: 50px;
-        font-size: 18px;
-        padding: 10px;
+    .swap {
+        position: relative;
         display: block;
-        font-weight: 400;
-        line-height: 1.6;
-        color: #495057;
-        background-color: #fff;
-        background-clip: padding-box;
-        border: 1px solid #ced4da;
-        border-radius: .25rem;
-        transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
-        background: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 5'%3E%3Cpath fill='%23343a40' d='M2 0L0 2h4zm0 5L0 3h4z'/%3E%3C/svg%3E") no-repeat right .75rem center/8px 10px;
-    }
-
-    .searchable ul {
-        display: none;
-        list-style-type: none;
-        background-color: #fff;
-        border-radius: 0 0 5px 5px;
-        border: 1px solid #add8e6;
-        border-top: none;
-        max-height: 180px;
-        margin: 0;
-        overflow-y: scroll;
-        overflow-x: hidden;
-        padding: 0;
-    }
-
-    .searchable ul li {
-        padding: 7px 9px;
-        border-bottom: 1px solid #e1e1e1;
-        cursor: pointer;
-        color: #6e6e6e;
-    }
-
-    .searchable ul li.selected {
-        background-color: #e8e8e8;
-        color: #333;
+        padding-top: 50px;
     }
 </style>
+<form id="GetBusJourneys" autocomplete="off">
+    @Html.ValidationSummary("", new { @class = "text-danger" })
+    @Html.AntiForgeryToken()
+    <div class="form-group">
+        <h5>Nereden</h5>
+        <select class="form-control" id="from" name="DestinationId" required>
+            <option value=@busLocationsList.Data.FirstOrDefault().Id selected>@busLocationsList.Data.FirstOrDefault().Name</option>
+            @foreach (BusLocationsData busLocations in busLocationsList.Data.Skip(1))
+            {
+                <option value="@busLocations.Id">@busLocations.Name</option>
+            }
+        </select>
+    </div>
 
-<div class="searchable">
-    <input type="text" placeholder="Search.." id="myInput" onkeyup="filterFunction(this,event)">
-    <ul>
-        @foreach (BusLocationsData busLocations in busLocationsList.Data)
-        {
-            <li>@busLocations.Name</li>
-        }
-    </ul>
-</div>
+    <a id="swap" href="#" class="btn btn-secondary btn-sm" role="button" aria-pressed="true">Swap</a>
+
+    <div class="form-group">
+        <h5>Nereye</h5>
+        <select class="form-control" id="to" name="OriginId" required>
+            <option value=@busLocationsList.Data.ElementAt(1).Id selected>@busLocationsList.Data.ElementAt(1).Name</option>
+            @foreach (BusLocationsData busLocations in busLocationsList.Data.SkipWhile(x => x.Id == 350).ToList())
+            {
+                <option value="@busLocations.Id">@busLocations.Name</option>
+            }
+        </select>
+    </div>
+    <div class="date">
+        <h5>Tarih</h5>
+        <div class="btn-group btn-group-toggle" data-toggle="buttons">
+            <button id="today" type="button" class="btn btn-secondary active">Bugün</button>
+            <button id="tomorrow" type="button" class="btn btn-secondary active">Yarın</button>
+        </div>
+        <input id="hiddenField" type="text" class="datepicker" style="display:none;" name="date" />
+        <h6 id="timeText"></h6>
+    </div>
+
+    <button id="send" type="button" class="btn btn-primary btn-lg">Bileti Bul</button>
+</form>
+
 
 <script>
-    function filterFunction(that, event) {
-        let container, input, filter, li, input_val;
-        container = $(that).closest(".searchable");
-        input_val = container.find("input").val().toUpperCase();
 
-        if (["ArrowDown", "ArrowUp", "Enter"].indexOf(event.key) != -1) {
-            keyControl(event, container)
-        } else {
-            li = container.find("ul li");
-            li.each(function (i, obj) {
-                if ($(this).text().toUpperCase().indexOf(input_val) > -1) {
-                    $(this).show();
-                } else {
-                    $(this).hide();
-                }
-            });
+    var monthNames = ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"];
+    var dayNames = ["Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi", "Pazar"];
 
-            container.find("ul li").removeClass("selected");
-            setTimeout(function () {
-                container.find("ul li:visible").first().addClass("selected");
-            }, 100)
+    $(document).ready(function () {
+        if (checkCookie("date") != false) {
+            var dateCookie = getCookie("date")
+            var date = new Date(dateCookie);
         }
-    }
+        else {
+            var date = new Date();
+            date.setDate(date.getDate() + 1);
+        }
+        var dayOfWeek = date.getUTCDay();
+        var month = date.getUTCMonth();
+        var text = date.getDate() + " " + monthNames[month] + " " + date.getFullYear() + " " + dayNames[dayOfWeek];
+        $('#timeText').text(text);
+        $('#hiddenField').val(date.toISOString());
 
-    function keyControl(e, container) {
-        if (e.key == "ArrowDown") {
-
-            if (container.find("ul li").hasClass("selected")) {
-                if (container.find("ul li:visible").index(container.find("ul li.selected")) + 1 < container.find("ul li:visible").length) {
-                    container.find("ul li.selected").removeClass("selected").nextAll().not('[style*="display: none"]').first().addClass("selected");
-                }
-
-            } else {
-                container.find("ul li:first-child").addClass("selected");
-            }
-
-        } else if (e.key == "ArrowUp") {
-
-            if (container.find("ul li:visible").index(container.find("ul li.selected")) > 0) {
-                container.find("ul li.selected").removeClass("selected").prevAll().not('[style*="display: none"]').first().addClass("selected");
-            }
-        } else if (e.key == "Enter") {
-            container.find("input").val(container.find("ul li.selected").text()).blur();
-            onSelect(container.find("ul li.selected").text())
+        if (checkCookie("from") != false) {
+            $('#from').val(getCookie("from"));
         }
 
-        container.find("ul li.selected")[0].scrollIntoView({
-            behavior: "smooth",
+        if (checkCookie("to") != false) {
+            $('#to').val(getCookie("to"));
+        }
+        
+
+        $("#hiddenField").datepicker({
+            showOn: "button",
+            buttonImage: "https://jqueryui.com/resources/demos/datepicker/images/calendar.gif",
+            buttonImageOnly: true,
+            buttonText: "Select date",
+            altFieldTimeOnly: true,
+            altFormat: "yy-mm-dd",
+            dateFormat: "dd-mm-yy",
+            monthNames: monthNames,
+            dayNamesMin: ["Pa", "Pt", "Sl", "Ça", "Pe", "Cu", "Ct"],
+            firstDay: 1,
+            defaultDate: new Date(),
+            minDate: 0,
+            onSelect: function (dateText, inst) {
+                var date = $(this).datepicker('getDate');
+                var dayOfWeek = date.getUTCDay();
+                var month = date.getUTCMonth();
+                var text = date.getDate() + " " + monthNames[month] + " " + date.getFullYear() + " " + dayNames[dayOfWeek];
+                $('#timeText').text(text);
+            }
         });
+    });
+
+    $('#today').click(function () {
+        var date = new Date();
+        var dayOfWeek = date.getUTCDay();
+        var month = date.getUTCMonth();
+        var text = date.getDate() + " " + monthNames[month] + " " + date.getFullYear() + " " + dayNames[dayOfWeek];
+        $('#timeText').text(text);
+        $('#hiddenField').val(date.getDate() + "-" + date.getUTCMonth() + "-" + date.getFullYear());
+    })
+
+    $('#tomorrow').click(function () {
+        var date = new Date();
+        date.setDate(date.getDate() + 1);
+        var dayOfWeek = date.getUTCDay();
+        var month = date.getUTCMonth();
+        var text = date.getDate() + " " + monthNames[month] + " " + date.getFullYear() + " " + dayNames[dayOfWeek];
+        $('#timeText').text(text);
+        $('#hiddenField').val(date.getDate() + "-" + date.getUTCMonth() + "-" + date.getFullYear());
+    })
+
+    $('#swap').click(function () {
+        var to = $('#to').val();
+        var from = $('#from').val();
+
+        $('#to').val(from);
+        $('#from').val(to);
+    })
+
+    $('#send').click(function () {
+        var from = Number($('#from').val());
+        var to = Number($('#to').val());
+        var date = $('#hiddenField').val();
+
+        setCookie("from", from);
+        setCookie("to", to);
+        setCookie("date", date);
+        
+        if (from == to) {
+            notifyOptions.title = 'Hata!';
+            notifyOptions.type = 'error';
+            notifyOptions.text = 'Same location as both origin and destination!';
+            new PNotify(notifyOptions);
+            return false;
+        }
+        var cookie = checkCookie("sessionCookie")
+        if (cookie !== false) {
+            var getBusJourneysModel = new Object();
+
+            getBusJourneysModel.Date = new Date().toISOString();
+
+            getBusJourneysModel.Data = new Object();
+            getBusJourneysModel.Data.DestinationId = to;
+            getBusJourneysModel.Data.OriginId = from;
+            getBusJourneysModel.Data.DepartureDate = date;
+
+            getBusJourneysModel.DeviceSession = new Object();
+            getBusJourneysModel.DeviceSession.DeviceId = cookie[0].replace("DeviceId=", "");
+            getBusJourneysModel.DeviceSession.SessionId = cookie[1].replace("SessionId=", "");
+
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("BusJourneys", "Home")",
+                data: JSON.stringify(getBusJourneysModel),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    if (response.result == 'Redirect')
+                        window.location = response.url;
+                },
+                error: function (err) {
+                    console.log(err);
+                }
+            })
+        }
+    })
+
+
+    function getCookie(cname) {
+        let name = cname + "=";
+        let decodedCookie = decodeURIComponent(document.cookie);
+        let ca = decodedCookie.split(';');
+        for (let i = 0; i < ca.length; i++) {
+            let c = ca[i];
+            while (c.charAt(0) == ' ') {
+                c = c.substring(1);
+            }
+            if (c.indexOf(name) == 0) {
+                return c.substring(name.length, c.length).split("&");
+            }
+        }
+        return "";
     }
 
-    function onSelect(val) {
-        alert(val)
+    function checkCookie(cname) {
+        let cookie = getCookie(cname);
+        if (cookie != "") {
+            return cookie;
+        } else {
+            return false;
+        }
     }
 
-    $(".searchable input").focus(function () {
-        $(this).closest(".searchable").find("ul").show();
-        $(this).closest(".searchable").find("ul li").show();
-    });
-    $(".searchable input").blur(function () {
-        let that = this;
-        setTimeout(function () {
-            $(that).closest(".searchable").find("ul").hide();
-        }, 300);
-    });
+    function setCookie(cname, cvalue) {
+        document.cookie = cname + "=" + cvalue + ";path=/";
+    }
 
-    $(document).on('click', '.searchable ul li', function () {
-        $(this).closest(".searchable").find("input").val($(this).text()).blur();
-        onSelect($(this).text())
-    });
-
-    $(".searchable ul li").hover(function () {
-        $(this).closest(".searchable").find("ul li.selected").removeClass("selected");
-        $(this).addClass("selected");
-    });
-
+    var notifyOptions = {
+        title: "Hata",
+        styling: 'bootstrap3',
+    };
 </script>
 

@@ -31,7 +31,7 @@
         padding-top: 50px;
     }
 </style>
-<form id="GetBusJourneys" autocomplete="off">
+<form id="GetBusJourneys" action='@Url.Action("BusJourneys", "Home")' method="post" autocomplete="off">
     @Html.ValidationSummary("", new { @class = "text-danger" })
     @Html.AntiForgeryToken()
     <div class="form-group">
@@ -63,11 +63,17 @@
             <button id="today" type="button" class="btn btn-secondary active">Bugün</button>
             <button id="tomorrow" type="button" class="btn btn-secondary active">Yarın</button>
         </div>
-        <input id="hiddenField" type="text" class="datepicker" style="display:none;" name="date" />
+        <input id="hiddenField" type="text" class="datepicker" style="display:none;" name="GetBusJourneysModel.Data.DepartureDate" />
         <h6 id="timeText"></h6>
     </div>
 
-    <button id="send" type="button" class="btn btn-primary btn-lg">Bileti Bul</button>
+    <button id="send" type="submit" class="btn btn-primary btn-lg">Bileti Bul</button>
+
+    <input id="nowDate" type="text" style="display:none;" name="GetBusJourneysModel.Date" />
+    <input id="destId" type="text" style="display:none;" name="GetBusJourneysModel.Data.DestinationId" />
+    <input id="originId" type="text" style="display:none;" name="GetBusJourneysModel.Data.OriginId" />
+    <input id="deviceId" type="text" style="display:none;" name="GetBusJourneysModel.DeviceSession.DeviceId" />
+    <input id="sessionId" type="text" style="display:none;" name="GetBusJourneysModel.DeviceSession.SessionId" />
 </form>
 
 
@@ -80,7 +86,7 @@
         if (checkCookie("date") != false) {
             var dateCookie = getCookie("date")
             darr = dateCookie[0].split("-");
-            var date = new Date(parseInt(darr[2]), parseInt(darr[1]), parseInt(darr[0]));
+            var date = new Date(parseInt(darr[2]), parseInt(darr[1]) - 1, parseInt(darr[0]));
         }
         else {
             var sDate = new Date();
@@ -99,7 +105,7 @@
         if (checkCookie("to") != false) {
             $('#to').val(getCookie("to"));
         }
-        
+
 
         $("#hiddenField").datepicker({
             showOn: "button",
@@ -151,7 +157,7 @@
         $('#from').val(to);
     })
 
-    $('#send').click(function () {
+    $('#GetBusJourneys').submit(function () {
         var from = Number($('#from').val());
         var to = Number($('#to').val());
         var date = $('#hiddenField').val();
@@ -159,7 +165,7 @@
         setCookie("from", from);
         setCookie("to", to);
         setCookie("date", date);
-        
+
         if (from == to) {
             notifyOptions.title = 'Hata!';
             notifyOptions.type = 'error';
@@ -169,20 +175,16 @@
         }
         var cookie = checkCookie("sessionCookie")
         if (cookie !== false) {
-            var getBusJourneysModel = new Object();
-
-            getBusJourneysModel.Date = new Date().toISOString();
-
-            getBusJourneysModel.Data = new Object();
-            getBusJourneysModel.Data.DestinationId = to;
-            getBusJourneysModel.Data.OriginId = from;
-            getBusJourneysModel.Data.DepartureDate = date;
-
-            getBusJourneysModel.DeviceSession = new Object();
-            getBusJourneysModel.DeviceSession.DeviceId = cookie[0].replace("DeviceId=", "");
-            getBusJourneysModel.DeviceSession.SessionId = cookie[1].replace("SessionId=", "");
-
-            $.ajax({
+            $('#nowDate').val(new Date().toISOString());
+            $('#destId').val(to);
+            $('#originId').val(from);
+            $('#deviceId').val(cookie[0].replace("DeviceId=", ""));
+            $('#sessionId').val(cookie[1].replace("SessionId=", ""));
+        }
+        else {
+                return false;
+            }
+            @*$.ajax({
                 type: "POST",
                 url: "@Url.Action("GetBusJourneys", "Home")",
                 data: JSON.stringify(getBusJourneysModel),
@@ -195,8 +197,7 @@
                 error: function (err) {
                     console.log(err);
                 }
-            })
-        }
+            })*@
     })
 
 

@@ -4,5 +4,15 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
+
 <h2>BusJourneys</h2>
+
+<a id="redirect" href="/" class="btn btn-secondary btn-sm" role="button" aria-pressed="true">Home</a>
+
+<script>
+    $('redirect').click ( function (e) {
+        e.preventDefault();
+        window.location.href = '@Url.Action("Index", "Home")';
+    });
+</script>
 

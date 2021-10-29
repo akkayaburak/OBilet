@@ -79,17 +79,18 @@
     $(document).ready(function () {
         if (checkCookie("date") != false) {
             var dateCookie = getCookie("date")
-            var date = new Date(dateCookie);
+            darr = dateCookie[0].split("-");
+            var date = new Date(parseInt(darr[2]), parseInt(darr[1]), parseInt(darr[0]));
         }
         else {
-            var date = new Date();
-            date.setDate(date.getDate() + 1);
+            var sDate = new Date();
+            var date = new Date(sDate.getFullYear(), sDate.getMonth(), sDate.getDate() + 1);
         }
         var dayOfWeek = date.getUTCDay();
         var month = date.getUTCMonth();
         var text = date.getDate() + " " + monthNames[month] + " " + date.getFullYear() + " " + dayNames[dayOfWeek];
         $('#timeText').text(text);
-        $('#hiddenField').val(date.toISOString());
+        $('#hiddenField').val(date.getDate() + "-" + (date.getMonth() + 1) + "-" + date.getFullYear());
 
         if (checkCookie("from") != false) {
             $('#from').val(getCookie("from"));
@@ -129,7 +130,7 @@
         var month = date.getUTCMonth();
         var text = date.getDate() + " " + monthNames[month] + " " + date.getFullYear() + " " + dayNames[dayOfWeek];
         $('#timeText').text(text);
-        $('#hiddenField').val(date.getDate() + "-" + date.getUTCMonth() + "-" + date.getFullYear());
+        $('#hiddenField').val(date.getDate() + "-" + (date.getMonth() + 1) + "-" + date.getFullYear());
     })
 
     $('#tomorrow').click(function () {
@@ -139,7 +140,7 @@
         var month = date.getUTCMonth();
         var text = date.getDate() + " " + monthNames[month] + " " + date.getFullYear() + " " + dayNames[dayOfWeek];
         $('#timeText').text(text);
-        $('#hiddenField').val(date.getDate() + "-" + date.getUTCMonth() + "-" + date.getFullYear());
+        $('#hiddenField').val(date.getDate() + "-" + (date.getMonth() + 1) + "-" + date.getFullYear());
     })
 
     $('#swap').click(function () {
@@ -183,7 +184,7 @@
 
             $.ajax({
                 type: "POST",
-                url: "@Url.Action("BusJourneys", "Home")",
+                url: "@Url.Action("GetBusJourneys", "Home")",
                 data: JSON.stringify(getBusJourneysModel),
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",

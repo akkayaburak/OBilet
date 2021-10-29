@@ -22,6 +22,20 @@ namespace OBilet.Controllers
         }
 
         [System.Web.Mvc.HttpPost]
+        public async Task<ActionResult> GetBusJourneys([FromBody] GetBusJourneysModel getBusJourneysModel)
+        {
+            //HttpClient client = new HttpClient
+            //{
+            //    BaseAddress = new Uri("https://v2-api.obilet.com/api")
+            //};
+            //client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", "JEcYcEMyantZV095WVc3G2JtVjNZbWx1");
+            //HttpRequestMessage req = new HttpRequestMessage(HttpMethod.Post, "https://v2-api.obilet.com/api/journey/getbusjourneys") { Content = new StringContent(JsonConvert.SerializeObject(getBusJourneysModel), Encoding.UTF8, "application/json") };
+            //var res = await client.SendAsync(req);
+            //string resString = await res.Content.ReadAsStringAsync();
+            //ViewData["BusJourneys"] = getBusJourneysModel;
+            return Json(new { result = "Redirect", url = Url.Action("BusJourneys", "Home") });
+        }
+
         public async Task<ActionResult> BusJourneys([FromBody] GetBusJourneysModel getBusJourneysModel)
         {
             //HttpClient client = new HttpClient
@@ -33,7 +47,7 @@ namespace OBilet.Controllers
             //var res = await client.SendAsync(req);
             //string resString = await res.Content.ReadAsStringAsync();
             //ViewData["BusJourneys"] = getBusJourneysModel;
-            return Json(new { result = "Redirect", url = Url.Action("ActionName", "Home") });
+            return View();
         }
     }
 }

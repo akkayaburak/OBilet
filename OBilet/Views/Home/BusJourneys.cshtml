@@ -17,6 +17,9 @@
         text-align: center;
     }
 </style>
+
+<a id="redirect" href="/" class="btn btn-secondary btn-sm" role="button" aria-pressed="true">Home</a>
+
 <div class="card w-50 text-white bg-primary mb-md-2 text-md-center mx-md-auto">
     <div class="card-body">
         <h5 class="card-title">@busJourneysList.Data.FirstOrDefault().OriginLocation - @busJourneysList.Data.FirstOrDefault().DestinationLocation</h5>
@@ -40,8 +43,6 @@
     </div>
 }
 
-
-<a id="redirect" href="/" class="btn btn-secondary btn-sm" role="button" aria-pressed="true">Home</a>
 
 <script>
     $('redirect').click ( function (e) {

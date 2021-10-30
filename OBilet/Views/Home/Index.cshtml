@@ -189,20 +189,6 @@
         else {
                 return false;
             }
-            @*$.ajax({
-                type: "POST",
-                url: "@Url.Action("GetBusJourneys", "Home")",
-                data: JSON.stringify(getBusJourneysModel),
-                contentType: "application/json; charset=utf-8",
-                dataType: "json",
-                success: function (response) {
-                    if (response.result == 'Redirect')
-                        window.location = response.url;
-                },
-                error: function (err) {
-                    console.log(err);
-                }
-            })*@
     })
 
 

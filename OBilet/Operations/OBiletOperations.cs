@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace OBilet.Operations
 {
@@ -73,7 +74,9 @@ namespace OBilet.Operations
             HttpRequestMessage req = new HttpRequestMessage(HttpMethod.Post, Helpers.UrlHelper.BusJourneysUrl) { Content = new StringContent(JsonConvert.SerializeObject(getBusJourneysModel), Encoding.UTF8, "application/json") };
             var res = await client.SendAsync(req);
             string resString = await res.Content.ReadAsStringAsync();
-            return JsonConvert.DeserializeObject<ResultBusJourneysModel>(resString);
+            ResultBusJourneysModel result = JsonConvert.DeserializeObject<ResultBusJourneysModel>(resString);
+            result.Data = result.Data.OrderBy(x => x.Journey.DepartureDateForOrder).ToList();
+            return result;
         }
 
     }

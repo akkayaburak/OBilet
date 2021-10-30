@@ -12,10 +12,12 @@ namespace OBilet.Controllers
         public async Task<ActionResult> Index()
         {
             ResultSessionModel resultSessionModel = await OBiletOperations.GetSession();
+            
             HttpCookie sessionCookie = new HttpCookie("sessionCookie");
             sessionCookie["DeviceId"] = resultSessionModel.Data.DeviceId;
             sessionCookie["SessionId"] = resultSessionModel.Data.SessionId;
             Response.Cookies.Add(sessionCookie);
+
             ResultBusLocationsModel busLocationsModel = await OBiletOperations.GetBusLocations(resultSessionModel);
             ViewData["BusLocations"] = busLocationsModel;
             return View();

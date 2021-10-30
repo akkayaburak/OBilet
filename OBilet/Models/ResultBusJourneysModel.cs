@@ -31,6 +31,7 @@ namespace OBilet.Models
         public string Departure { get; set; }
         public string DepartureDateTop => DateTime.Parse(Departure).ToString("dd MMMM dddd");
         public string DepartureDate => DateTime.Parse(Departure).ToString("hh:mm");
+        public DateTime DepartureDateForOrder => DateTime.Parse(Departure);
         public string ArrivalDate => !string.IsNullOrEmpty(Arrival) ? DateTime.Parse(Arrival).ToString("hh:mm") : "";
         public string Arrival { get; set; }
         [JsonProperty("internet-price")]

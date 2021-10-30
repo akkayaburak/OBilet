@@ -15,11 +15,12 @@
 <style>
     div.container.body-content {
         text-align: center;
+        margin: auto;
     }
 
     div.form-group {
         width: 200px;
-        height: 80px;
+        /*height: 60px;*/
         float: none;
         margin: auto;
         position: relative;
@@ -35,8 +36,8 @@
     @Html.ValidationSummary("", new { @class = "text-danger" })
     @Html.AntiForgeryToken()
     <div class="form-group">
-        <h5>Nereden</h5>
-        <select class="form-control" id="from" name="DestinationId" required>
+        <h6>Nereden</h6>
+        <select class="form-control form-control-sm" id="from" name="DestinationId" required>
             <option value=@busLocationsList.Data.FirstOrDefault().Id selected>@busLocationsList.Data.FirstOrDefault().Name</option>
             @foreach (BusLocationsData busLocations in busLocationsList.Data.Skip(1))
             {
@@ -48,7 +49,7 @@
     <a id="swap" href="#" class="btn btn-secondary btn-sm" role="button" aria-pressed="true">Swap</a>
 
     <div class="form-group">
-        <h5>Nereye</h5>
+        <h6>Nereye</h6>
         <select class="form-control" id="to" name="OriginId" required>
             <option value=@busLocationsList.Data.ElementAt(1).Id selected>@busLocationsList.Data.ElementAt(1).Name</option>
             @foreach (BusLocationsData busLocations in busLocationsList.Data.SkipWhile(x => x.Id == 350).ToList())
@@ -57,17 +58,21 @@
             }
         </select>
     </div>
-    <div class="date">
-        <h5>Tarih</h5>
-        <div class="btn-group btn-group-toggle" data-toggle="buttons">
-            <button id="today" type="button" class="btn btn-secondary active">Bugün</button>
-            <button id="tomorrow" type="button" class="btn btn-secondary active">Yarın</button>
+    <div class="date form-row">
+        <div class=" form-group row-cols-md-2">
+            <span>Tarih</span>
+            <div class="btn-group btn-group-vertical" data-toggle="buttons">
+                <button id="today" type="button" class="btn btn-secondary active btn-sm">Bugün</button>
+                <button id="tomorrow" type="button" class="btn btn-secondary active btn-sm">Yarın</button>
+            </div>
         </div>
+        <span id="timeText"></span>
         <input id="hiddenField" type="text" class="datepicker" style="display:none;" name="GetBusJourneysModel.Data.DepartureDate" />
-        <h6 id="timeText"></h6>
     </div>
 
-    <button id="send" type="submit" class="btn btn-primary btn-lg">Bileti Bul</button>
+    <div class="form-group">
+        <button id="send" type="submit" class="btn btn-primary btn-lg">Bileti Bul</button>
+    </div>
 
     <input id="nowDate" type="text" style="display:none;" name="GetBusJourneysModel.Date" />
     <input id="destId" type="text" style="display:none;" name="GetBusJourneysModel.Data.DestinationId" />

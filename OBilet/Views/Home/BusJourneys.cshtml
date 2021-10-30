@@ -1,11 +1,45 @@
-﻿
+﻿@using OBilet.Models;
 @{
     ViewBag.Title = "BusJourneys";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
+@{
+    var busJourneysList = (ResultBusJourneysModel)ViewData["BusJourneys"];
+}
 
-<h2>BusJourneys</h2>
+<style>
+    div.container.body-content {
+        text-align: center;
+    }
+
+    card, w-50, text-white, bg-primary {
+        text-align: center;
+    }
+</style>
+<div class="card w-50 text-white bg-primary mb-md-2 text-md-center mx-md-auto">
+    <div class="card-body">
+        <h5 class="card-title">@busJourneysList.Data.FirstOrDefault().OriginLocation - @busJourneysList.Data.FirstOrDefault().DestinationLocation</h5>
+        <p class="card-text">@busJourneysList.Data.FirstOrDefault().Journey.DepartureDateTop</p>
+    </div>
+</div>
+
+
+@foreach (var journey in busJourneysList.Data)
+{
+    <div class="card w-50 mx-md-auto">
+        <div class="card-body">
+            <h5 class="card-title">
+                <span>Kalkış - Varış</span>
+                <br>
+                <span>@journey.Journey.ArrivalDate - @journey.Journey.DepartureDate</span>
+            </h5>
+            <p class="card-text">@journey.Journey.Origin - @journey.Journey.Destination</p>
+            <a href="#" class="btn btn-primary btn-danger">@journey.Journey.InternetPrice TL</a>
+        </div>
+    </div>
+}
+
 
 <a id="redirect" href="/" class="btn btn-secondary btn-sm" role="button" aria-pressed="true">Home</a>
 

@@ -1,5 +1,6 @@
 ﻿using OBilet.Models;
 using OBilet.Operations;
+using System;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
@@ -11,23 +12,41 @@ namespace OBilet.Controllers
     {
         public async Task<ActionResult> Index()
         {
-            ResultSessionModel resultSessionModel = await OBiletOperations.GetSession();
-            
-            HttpCookie sessionCookie = new HttpCookie("sessionCookie");
-            sessionCookie["DeviceId"] = resultSessionModel.Data.DeviceId;
-            sessionCookie["SessionId"] = resultSessionModel.Data.SessionId;
-            Response.Cookies.Add(sessionCookie);
+            try
+            {
+                ResultSessionModel resultSessionModel = await OBiletOperations.GetSession();
 
-            ResultBusLocationsModel busLocationsModel = await OBiletOperations.GetBusLocations(resultSessionModel);
-            ViewData["BusLocations"] = busLocationsModel;
-            return View();
+                HttpCookie sessionCookie = new HttpCookie("sessionCookie");
+                sessionCookie["DeviceId"] = resultSessionModel.Data.DeviceId;
+                sessionCookie["SessionId"] = resultSessionModel.Data.SessionId;
+                Response.Cookies.Add(sessionCookie);
+
+                ResultBusLocationsModel busLocationsModel = await OBiletOperations.GetBusLocations(resultSessionModel);
+                ViewData["BusLocations"] = busLocationsModel;
+                return View();
+            } 
+            catch(Exception ex)
+            {
+                ModelState.AddModelError("Index", ex);
+                return View();
+            }
+            
         }
 
         public async Task<ActionResult> BusJourneys([FromBody] GetBusJourneysModel getBusJourneysModel)
         {
-            ResultBusJourneysModel resultBusJourneysModel = await OBiletOperations.GetBusJourneys(getBusJourneysModel);
-            ViewData["BusJourneys"] = resultBusJourneysModel;
-            return View();
+            try
+            {
+                ResultBusJourneysModel resultBusJourneysModel = await OBiletOperations.GetBusJourneys(getBusJourneysModel);
+                ViewData["BusJourneys"] = resultBusJourneysModel;
+                return View();
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("BusJourneys", ex);
+                return View();
+            }
+            
         }
     }
 }

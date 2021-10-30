@@ -74,6 +74,9 @@ namespace OBilet.Operations
             HttpRequestMessage req = new HttpRequestMessage(HttpMethod.Post, Helpers.UrlHelper.BusJourneysUrl) { Content = new StringContent(JsonConvert.SerializeObject(getBusJourneysModel), Encoding.UTF8, "application/json") };
             var res = await client.SendAsync(req);
             string resString = await res.Content.ReadAsStringAsync();
+            res.Dispose();
+            client.Dispose();
+
             ResultBusJourneysModel result = JsonConvert.DeserializeObject<ResultBusJourneysModel>(resString);
             result.Data = result.Data.OrderBy(x => x.Journey.DepartureDateForOrder).ToList();
             return result;

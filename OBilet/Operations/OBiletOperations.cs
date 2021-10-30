@@ -12,7 +12,11 @@ namespace OBilet.Operations
     public class OBiletOperations
     {
         private static readonly string Token = "JEcYcEMyantZV095WVc3G2JtVjNZbWx1";
-        public static async Task<ResultSessionModel> GetSession()
+        /// <summary>
+        /// Basicly logins to OBilet.
+        /// </summary>
+        /// <returns>DeviceId and SessionId for requesting information from OBilet.</returns>
+        public static async Task<ResultSessionModel> GetSession(string deviceId = null, string sessionId = null)
         {
             var client = new HttpClient();
             GetSessionModel model = new GetSessionModel
@@ -40,7 +44,11 @@ namespace OBilet.Operations
 
             return JsonConvert.DeserializeObject<ResultSessionModel>(resString);
         }
-
+        /// <summary>
+        /// Requests to OBilet to get bus locations.
+        /// </summary>
+        /// <param name="resultSessionModel"></param>
+        /// <returns>All the bus locations.</returns>
         public static async Task<ResultBusLocationsModel> GetBusLocations(ResultSessionModel resultSessionModel)
         {
             GetBusLocationsModel getBusLocations = new GetBusLocationsModel
@@ -64,6 +72,11 @@ namespace OBilet.Operations
             client.Dispose();
             return JsonConvert.DeserializeObject<ResultBusLocationsModel>(resString);
         }
+        /// <summary>
+        /// Requests to OBilet to get bus journeys.
+        /// </summary>
+        /// <param name="getBusJourneysModel"></param>
+        /// <returns>All the bus journeys with specified Date, Origin and Destination.</returns>
         public static async Task<ResultBusJourneysModel> GetBusJourneys(GetBusJourneysModel getBusJourneysModel)
         {
             HttpClient client = new HttpClient

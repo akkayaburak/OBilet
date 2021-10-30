@@ -1,6 +1,7 @@
 ﻿using OBilet.Models;
 using OBilet.Operations;
 using System;
+using System.Runtime.Caching;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
@@ -10,6 +11,7 @@ namespace OBilet.Controllers
 {
     public class HomeController : Controller
     {
+        [OutputCache(NoStore = true, Duration = 0, VaryByParam = "None")]
         public async Task<ActionResult> Index()
         {
             try
@@ -28,11 +30,15 @@ namespace OBilet.Controllers
             catch(Exception ex)
             {
                 ModelState.AddModelError("Index", ex);
-                return View();
+                return View("Error");
             }
             
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="getBusJourneysModel"></param>
+        /// <returns>All the bus journeys with specified Date, Origin and Destination</returns>
         public async Task<ActionResult> BusJourneys([FromBody] GetBusJourneysModel getBusJourneysModel)
         {
             try
@@ -44,7 +50,7 @@ namespace OBilet.Controllers
             catch (Exception ex)
             {
                 ModelState.AddModelError("BusJourneys", ex);
-                return View();
+                return View("Error");
             }
             
         }

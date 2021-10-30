@@ -5,7 +5,18 @@
 
 
 @{
-    var busLocationsList = (ResultBusLocationsModel)ViewData["BusLocations"];
+    ResultBusLocationsModel busLocationsList = (ResultBusLocationsModel)ViewData["BusLocations"];
+    BusLocationsData firstData = new BusLocationsData();
+    BusLocationsData secondData = new BusLocationsData();
+
+    if (busLocationsList.Data.Count > 1)
+    {
+        firstData = busLocationsList.Data.First();
+        secondData = busLocationsList.Data.Skip(1).First();
+    }
+    else
+    {
+    }
 }
 <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
 <script src="https://code.jquery.com/ui/1.12.0/jquery-ui.js"></script>
@@ -15,30 +26,23 @@
 <style>
     div.container.body-content {
         text-align: center;
-        margin: auto;
     }
 
     div.form-group {
         width: 200px;
-        /*height: 60px;*/
         float: none;
         margin: auto;
         position: relative;
     }
-
-    .swap {
-        position: relative;
-        display: block;
-        padding-top: 50px;
-    }
 </style>
+
 <form id="GetBusJourneys" action='@Url.Action("BusJourneys", "Home")' method="post" autocomplete="off">
     @Html.ValidationSummary("", new { @class = "text-danger" })
     @Html.AntiForgeryToken()
     <div class="form-group">
         <h6>Nereden</h6>
         <select class="form-control form-control-sm" id="from" name="DestinationId" required>
-            <option value=@busLocationsList.Data.FirstOrDefault().Id selected>@busLocationsList.Data.FirstOrDefault().Name</option>
+            <option value=@firstData.Id selected>@firstData.Name</option>
             @foreach (BusLocationsData busLocations in busLocationsList.Data.Skip(1))
             {
                 <option value="@busLocations.Id">@busLocations.Name</option>
@@ -46,13 +50,13 @@
         </select>
     </div>
 
-    <a id="swap" href="#" class="btn btn-secondary btn-sm" role="button" aria-pressed="true">Swap</a>
+    <a id="swap" href="#" class="swap btn btn-secondary btn-sm" role="button" aria-pressed="true">Swap</a>
 
     <div class="form-group">
         <h6>Nereye</h6>
-        <select class="form-control" id="to" name="OriginId" required>
-            <option value=@busLocationsList.Data.ElementAt(1).Id selected>@busLocationsList.Data.ElementAt(1).Name</option>
-            @foreach (BusLocationsData busLocations in busLocationsList.Data.SkipWhile(x => x.Id == 350).ToList())
+        <select class="form-control form-control-sm" id="to" name="OriginId" required>
+            <option value=@secondData.Id selected>@secondData.Name</option>
+            @foreach (BusLocationsData busLocations in busLocationsList.Data.Where(x => x.Id != secondData.Id).ToList())
             {
                 <option value="@busLocations.Id">@busLocations.Name</option>
             }
@@ -187,8 +191,12 @@
             $('#sessionId').val(cookie[1].replace("SessionId=", ""));
         }
         else {
-                return false;
-            }
+            notifyOptions.title = 'Hata!';
+            notifyOptions.type = 'error';
+            notifyOptions.text = 'Session and/or Device informatin could not be found!';
+            new PNotify(notifyOptions);
+            return false;
+        }
     })
 
 

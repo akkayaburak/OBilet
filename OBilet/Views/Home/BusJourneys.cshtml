@@ -16,14 +16,22 @@
     card, w-50, text-white, bg-primary {
         text-align: center;
     }
+    .card-header-pills {
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
 </style>
 
-<a id="redirect" href="/" class="btn btn-secondary btn-sm" role="button" aria-pressed="true">Home</a>
+
 
 <div class="card w-50 text-white bg-primary mb-md-2 text-md-center mx-md-auto">
     <div class="card-body">
         <h5 class="card-title">@busJourneysList.Data.FirstOrDefault().OriginLocation - @busJourneysList.Data.FirstOrDefault().DestinationLocation</h5>
         <p class="card-text">@busJourneysList.Data.FirstOrDefault().Journey.DepartureDateTop</p>
+    </div>
+    <div class="card-header-pills">
+        <a id="redirect" href="/" class="btn btn-secondary btn-sm" role="button" aria-pressed="true">Home</a>
     </div>
 </div>
 
@@ -33,9 +41,9 @@
     <div class="card w-50 mx-md-auto">
         <div class="card-body">
             <h5 class="card-title">
-                <span>Kalkış - Varış</span>
+                <small>Kalkış - Varış</small>
                 <br>
-                <span>@journey.Journey.ArrivalDate - @journey.Journey.DepartureDate</span>
+                <small>@journey.Journey.ArrivalDate - @journey.Journey.DepartureDate</small>
             </h5>
             <p class="card-text">@journey.Journey.Origin - @journey.Journey.Destination</p>
             <a href="#" class="btn btn-primary btn-danger">@journey.Journey.InternetPrice TL</a>

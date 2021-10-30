@@ -63,5 +63,18 @@ namespace OBilet.Operations
             client.Dispose();
             return JsonConvert.DeserializeObject<ResultBusLocationsModel>(resString);
         }
+        public static async Task<ResultBusJourneysModel> GetBusJourneys(GetBusJourneysModel getBusJourneysModel)
+        {
+            HttpClient client = new HttpClient
+            {
+                BaseAddress = new Uri(Helpers.UrlHelper.BaseUrl)
+            };
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Token);
+            HttpRequestMessage req = new HttpRequestMessage(HttpMethod.Post, Helpers.UrlHelper.BusJourneysUrl) { Content = new StringContent(JsonConvert.SerializeObject(getBusJourneysModel), Encoding.UTF8, "application/json") };
+            var res = await client.SendAsync(req);
+            string resString = await res.Content.ReadAsStringAsync();
+            return JsonConvert.DeserializeObject<ResultBusJourneysModel>(resString);
+        }
+
     }
 }

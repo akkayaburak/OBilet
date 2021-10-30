@@ -134,6 +134,7 @@
     <Compile Include="Models\GetBusJourneysModel.cs" />
     <Compile Include="Models\GetBusLocationsModel.cs" />
     <Compile Include="Models\GetSessionModel.cs" />
+    <Compile Include="Models\ResultBusJourneysModel.cs" />
     <Compile Include="Models\ResultBusLocationsModel.cs" />
     <Compile Include="Models\ResultSessionModel.cs" />
     <Compile Include="Operations\OBiletOperations.cs" />

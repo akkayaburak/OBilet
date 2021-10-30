@@ -23,15 +23,8 @@ namespace OBilet.Controllers
 
         public async Task<ActionResult> BusJourneys([FromBody] GetBusJourneysModel getBusJourneysModel)
         {
-            //HttpClient client = new HttpClient
-            //{
-            //    BaseAddress = new Uri("https://v2-api.obilet.com/api")
-            //};
-            //client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", "JEcYcEMyantZV095WVc3G2JtVjNZbWx1");
-            //HttpRequestMessage req = new HttpRequestMessage(HttpMethod.Post, "https://v2-api.obilet.com/api/journey/getbusjourneys") { Content = new StringContent(JsonConvert.SerializeObject(getBusJourneysModel), Encoding.UTF8, "application/json") };
-            //var res = await client.SendAsync(req);
-            //string resString = await res.Content.ReadAsStringAsync();
-            //ViewData["BusJourneys"] = getBusJourneysModel;
+            ResultBusJourneysModel resultBusJourneysModel = await OBiletOperations.GetBusJourneys(getBusJourneysModel);
+            ViewData["BusJourneys"] = resultBusJourneysModel;
             return View();
         }
     }

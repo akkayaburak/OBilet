@@ -24,8 +24,12 @@ namespace OBilet.Controllers
                 Response.Cookies.Add(sessionCookie);
 
                 ResultBusLocationsModel busLocationsModel = await OBiletOperations.GetBusLocations(resultSessionModel);
-                ViewData["BusLocations"] = busLocationsModel;
-                return View();
+                if (busLocationsModel.Data.Count > 1)
+                {
+                    ViewData["BusLocations"] = busLocationsModel;
+                    return View();
+                }
+                return View("Error");
             } 
             catch(Exception ex)
             {
@@ -44,8 +48,12 @@ namespace OBilet.Controllers
             try
             {
                 ResultBusJourneysModel resultBusJourneysModel = await OBiletOperations.GetBusJourneys(getBusJourneysModel);
-                ViewData["BusJourneys"] = resultBusJourneysModel;
-                return View();
+                if (resultBusJourneysModel.Data.Count > 1)
+                {
+                    ViewData["BusJourneys"] = resultBusJourneysModel;
+                    return View();
+                }
+                return View("Error");
             }
             catch (Exception ex)
             {

@@ -2,10 +2,8 @@
 @{
     ViewBag.Title = "BusJourneys";
     Layout = "~/Views/Shared/_Layout.cshtml";
-}
-
-@{
-    var busJourneysList = (ResultBusJourneysModel)ViewData["BusJourneys"];
+    ResultBusJourneysModel busJourneysList = (ResultBusJourneysModel)ViewData["BusJourneys"];
+    BusJourneysData first = busJourneysList.Data.First();
 }
 
 <style>
@@ -27,8 +25,8 @@
 
 <div class="card w-50 text-white bg-primary mb-md-2 text-md-center mx-md-auto">
     <div class="card-body">
-        <h5 class="card-title">@busJourneysList.Data.FirstOrDefault().OriginLocation - @busJourneysList.Data.FirstOrDefault().DestinationLocation</h5>
-        <p class="card-text">@busJourneysList.Data.FirstOrDefault().Journey.DepartureDateTop</p>
+        <h5 class="card-title">@first.OriginLocation - @first.DestinationLocation</h5>
+        <p class="card-text">@first.Journey.DepartureDateTop</p>
     </div>
     <div class="card-header-pills">
         <a id="redirect" href="/" class="btn btn-secondary btn-sm" role="button" aria-pressed="true">Home</a>

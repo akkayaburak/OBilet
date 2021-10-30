@@ -1,23 +1,12 @@
 ﻿@using OBilet.Models;
+
 @{
     ViewBag.Title = "Home Page";
-}
-
-
-@{
     ResultBusLocationsModel busLocationsList = (ResultBusLocationsModel)ViewData["BusLocations"];
-    BusLocationsData firstData = new BusLocationsData();
-    BusLocationsData secondData = new BusLocationsData();
-
-    if (busLocationsList.Data.Count > 1)
-    {
-        firstData = busLocationsList.Data.First();
-        secondData = busLocationsList.Data.Skip(1).First();
-    }
-    else
-    {
-    }
+    BusLocationsData firstData = busLocationsList.Data.First();
+    BusLocationsData secondData = busLocationsList.Data.Skip(1).First();
 }
+
 <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
 <script src="https://code.jquery.com/ui/1.12.0/jquery-ui.js"></script>
 <script src="~/Scripts/pnotify.js"></script>
